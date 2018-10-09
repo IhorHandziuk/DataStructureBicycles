@@ -74,8 +74,8 @@ public:
 
 private:
     vector<vector<T>> elemHashes;
+
     size_t elemCount;                            // sum of elements in all buckets
-    myHash <T> hasher;                            // standart stl hasher
 
     size_t currPowerOf2;                         // count of buckets
 
@@ -107,7 +107,7 @@ inline void unordered_set<T>::insert(const T &k) {
             currPowerOf2 *= 2;
             elemHashes = createRemappedTable();                // complex operation
         }
-        size_t hashIndex = fastMod(hasher(k), currPowerOf2);
+        size_t hashIndex = fastMod(std::hash(k), currPowerOf2);
         elemHashes[hashIndex].push_back(k);
     }
 }
@@ -116,14 +116,14 @@ template<typename T>
 inline bool unordered_set<T>::erase(const T &k) {
     if (find(k)) {
         elemCount--;
-        size_t hashIndex = fastMod(hasher(k), currPowerOf2);
+        size_t hashIndex = fastMod(std::hash(k), currPowerOf2);
         return elemHashes[hashIndex].erase(k);
     } else return false;
 }
 
 template<typename T>
 inline bool unordered_set<T>::find(const T &k) const {
-    size_t hashIndex = fastMod(hasher(k), currPowerOf2);
+    size_t hashIndex = fastMod(std::hash(k), currPowerOf2);
     const vector<T> &bucket = elemHashes[hashIndex];
 
     for (auto it : bucket) {
@@ -220,7 +220,7 @@ inline vector<vector<T>> unordered_set<T>::createRemappedTable() const {
     newElemHashes.resize(currPowerOf2);
     for (auto i : elemHashes) {
         for (auto j : i) {
-            size_t hashIndex = fastMod(hasher(j), currPowerOf2);
+            size_t hashIndex = fastMod(std::hash(j), currPowerOf2);
             newElemHashes[hashIndex].push_back(j);
         }
     }
